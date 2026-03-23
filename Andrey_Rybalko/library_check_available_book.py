@@ -1,6 +1,15 @@
 YES = "yes"
 NO = "no"
 
+COMMAND_ADD_BOOK = "add"
+COMMAND_GET_LIST_OF_BOOK = "view"
+COMMAND_FIND_BOOK = "find"
+COMMAND_RETURN_BOOK = "return"
+COMMAND_ISSUE_BOOK = "issue"
+COMMAND_DELETE_BOOK = "delete"
+COMMAND_EXIT_PROGRAM = "exit"
+COMMAND_SHOW_COMMANDS = "commands"
+
 def book_list_view(current_library):
     if not current_library:
         print("Библиотека пуста!")
@@ -95,7 +104,6 @@ def find_book(book_name, library):
         f"Автор: {library[book_name]['author']}\n"
         f"Год издания: {library[book_name]['year']}"
     )
-
     print_book_available_status(book_name, library)
 
 
@@ -112,7 +120,6 @@ def print_book_available_status(book_name, library):
 def remove_book(book_name, library):
     if check_book_in_library(book_name, library):
         del library[book_name]
-
         print(f"Книга \"{book_name}\" успешно удалена из библиотеки!")
 
 
@@ -183,32 +190,78 @@ def get_library():
     return library
 
 
+def show_commands():
+    print(f"\n{COMMAND_ADD_BOOK} - Добавить книгу в библиотеку"
+          f"\n{COMMAND_DELETE_BOOK} - Удалить книгу из библиотеки"
+          f"\n{COMMAND_FIND_BOOK} - Найти книгу в библиотеке"
+          f"\n{COMMAND_ISSUE_BOOK} - Взять книгу из библиотеки"
+          f"\n{COMMAND_RETURN_BOOK} - Вернуть книгу в библиотеку"
+          f"\n{COMMAND_GET_LIST_OF_BOOK} - Показать список книг в библиотеке"
+          f"\n{COMMAND_EXIT_PROGRAM} - Завершить работу программы"
+          f"\n{COMMAND_SHOW_COMMANDS} - Показать список команд")
+
+
+def get_book_parameters():
+    while True:
+        book_name = input("Введите название книги: ")
+        author = input("Введите автора: ")
+
+        if not book_name or not author:
+            print("Ошибка! Название и автор не могут быть пустыми!")
+            continue
+
+        try:
+            year = int(input("Введите год издания: "))
+            if year < 0:
+                print("Ошибка! Год не может быть отрицательным!")
+                continue
+            return book_name, author, year
+        except ValueError:
+            print("Ошибка! Год должен быть числом!")
+
+
+def use_commands(library):
+    command = input("\nВведите команду: ").lower()
+
+    match command:
+        case x if x == COMMAND_ADD_BOOK:
+            book_name, author, year = get_book_parameters()
+            add_book(book_name, author, year, library)
+            return True
+        case x if x == COMMAND_DELETE_BOOK:
+            remove_book(input("Введите название книги: "), library)
+            return True
+        case x if x == COMMAND_FIND_BOOK:
+            find_book(input("Введите название книги: "), library)
+            return True
+        case x if x == COMMAND_ISSUE_BOOK:
+            issue_book(input("Введите название книги: "), library)
+            return True
+        case x if x == COMMAND_RETURN_BOOK:
+            return_book(input("Введите название книги: "), library)
+            return True
+        case x if x == COMMAND_GET_LIST_OF_BOOK:
+            book_list_view(library)
+            return True
+        case x if x == COMMAND_EXIT_PROGRAM:
+            return False
+        case x if x == COMMAND_SHOW_COMMANDS:
+            show_commands()
+            return True
+        case _:
+            print("Неизвестная команда")
+            return True
+
+
 def program():
+    print("Добро пожаловать в библиотеку!")
     library = get_library()
-    book_list_view(library)
+    show_commands()
 
-    add_book("Гарри Поттер и философский камень", "Дж. К. Роулинг", 1111, library)
-    book_list_view(library)
+    while True:
+         if not use_commands(library):
+             break
 
-    add_book("Гарри Поттер и Тайная комната", "Дж. К. Роулинг", 1998, library)
-    book_list_view(library)
-
-    remove_book("Абоба", library)
-    remove_book("Преступление и наказание", library)
-    book_list_view(library)
-
-    issue_book("Aboba", library)
-    return_book("Aboba", library)
-    issue_book("Гарри Поттер и Тайная комната", library)
-    return_book("Гарри Поттер и Тайная комната", library)
-    issue_book("Властелин колец", library)
-    issue_book("Властелин колец", library)
-    return_book("Властелин колец", library)
-    return_book("Властелин колец", library)
-
-    find_book("Мастер и Маргарита", library)
-    find_book("C# Для Начинающих на практике", library)
-    find_book("1984", library)
-    find_book("Гарри Поттер и Тайная комната", library)
+    print("Работа программы завершена")
 
 program()
