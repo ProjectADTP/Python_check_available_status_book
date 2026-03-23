@@ -1,14 +1,16 @@
 YES = "yes"
 NO = "no"
 
-COMMAND_ADD_BOOK = "add"
-COMMAND_GET_LIST_OF_BOOK = "view"
-COMMAND_FIND_BOOK = "find"
-COMMAND_RETURN_BOOK = "return"
-COMMAND_ISSUE_BOOK = "issue"
-COMMAND_DELETE_BOOK = "delete"
-COMMAND_EXIT_PROGRAM = "exit"
-COMMAND_SHOW_COMMANDS = "commands"
+COMMANDS = {
+    "add": "Добавить книгу в библиотеку",
+    "delete": "Удалить книгу из библиотеки",
+    "find": "Найти книгу в библиотеке",
+    "issue": "Взять книгу из библиотеки",
+    "return": "Вернуть книгу в библиотеку",
+    "view": "Показать список книг в библиотеке",
+    "commands": "Показать список команд",
+    "exit": "Завершить работу программы",
+}
 
 def book_list_view(current_library):
     if not current_library:
@@ -191,14 +193,9 @@ def get_library():
 
 
 def show_commands():
-    print(f"\n{COMMAND_ADD_BOOK} - Добавить книгу в библиотеку"
-          f"\n{COMMAND_DELETE_BOOK} - Удалить книгу из библиотеки"
-          f"\n{COMMAND_FIND_BOOK} - Найти книгу в библиотеке"
-          f"\n{COMMAND_ISSUE_BOOK} - Взять книгу из библиотеки"
-          f"\n{COMMAND_RETURN_BOOK} - Вернуть книгу в библиотеку"
-          f"\n{COMMAND_GET_LIST_OF_BOOK} - Показать список книг в библиотеке"
-          f"\n{COMMAND_EXIT_PROGRAM} - Завершить работу программы"
-          f"\n{COMMAND_SHOW_COMMANDS} - Показать список команд")
+    print()
+    for command, description in COMMANDS.items():
+        print(f"{command} - {description}")
 
 
 def get_book_parameters():
@@ -223,34 +220,23 @@ def get_book_parameters():
 def use_commands(library):
     command = input("\nВведите команду: ").lower()
 
-    match command:
-        case x if x == COMMAND_ADD_BOOK:
-            book_name, author, year = get_book_parameters()
-            add_book(book_name, author, year, library)
-            return True
-        case x if x == COMMAND_DELETE_BOOK:
-            remove_book(input("Введите название книги: "), library)
-            return True
-        case x if x == COMMAND_FIND_BOOK:
-            find_book(input("Введите название книги: "), library)
-            return True
-        case x if x == COMMAND_ISSUE_BOOK:
-            issue_book(input("Введите название книги: "), library)
-            return True
-        case x if x == COMMAND_RETURN_BOOK:
-            return_book(input("Введите название книги: "), library)
-            return True
-        case x if x == COMMAND_GET_LIST_OF_BOOK:
-            book_list_view(library)
-            return True
-        case x if x == COMMAND_EXIT_PROGRAM:
-            return False
-        case x if x == COMMAND_SHOW_COMMANDS:
-            show_commands()
-            return True
-        case _:
-            print("Неизвестная команда")
-            return True
+    menu_actions = {
+        "add": lambda: add_book(*get_book_parameters(), library),
+        "delete": lambda: remove_book(input("Введите название книги: "), library),
+        "find": lambda: find_book(input("Введите название книги: "), library),
+        "issue": lambda: issue_book(input("Введите название книги: "), library),
+        "return": lambda: return_book(input("Введите название книги: "), library),
+        "view": lambda: book_list_view(library),
+        "commands": lambda: show_commands(),
+        "exit": lambda: False,
+    }
+
+    if command in menu_actions:
+        result = menu_actions[command]()
+        return result if result is not None else True
+    else:
+        print("Неизвестная команда")
+        return True
 
 
 def program():
