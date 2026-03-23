@@ -12,6 +12,7 @@ COMMANDS = {
     "exit": "Завершить работу программы",
 }
 
+
 def book_list_view(current_library):
     if not current_library:
         print("Библиотека пуста!")
@@ -39,8 +40,10 @@ def add_book(book_name, author, year, library):
 
 def try_change_available_status(book_name, library):
     while True:
-        answer = input(f"Статус наличия книги \"{book_name}\" не определён!\n"
-              "Желаете его изменить? (yes/no): ")
+        answer = input(
+            f"Статус наличия книги \"{book_name}\" не определён!"
+            f"\n""Желаете его изменить? (yes/no): "
+        ).lower()
         if answer == YES:
             set_available_status(book_name, library)
             return True
@@ -93,6 +96,7 @@ def return_book(book_name, library):
 def check_book_in_library(book_name, library):
     if book_name in library:
         return True
+
     print(f"\nКниги \"{book_name}\" нет в библиотеке!")
     return False
 
@@ -192,9 +196,9 @@ def get_library():
     return library
 
 
-def show_commands():
+def show_commands(commands):
     print()
-    for command, description in COMMANDS.items():
+    for command, description in commands.items():
         print(f"{command} - {description}")
 
 
@@ -217,7 +221,7 @@ def get_book_parameters():
             print("Ошибка! Год должен быть числом!")
 
 
-def use_commands(library):
+def use_commands(library, commands):
     command = input("\nВведите команду: ").lower()
 
     menu_actions = {
@@ -227,7 +231,7 @@ def use_commands(library):
         "issue": lambda: issue_book(input("Введите название книги: "), library),
         "return": lambda: return_book(input("Введите название книги: "), library),
         "view": lambda: book_list_view(library),
-        "commands": lambda: show_commands(),
+        "commands": lambda: show_commands(commands),
         "exit": lambda: False,
     }
 
@@ -242,12 +246,13 @@ def use_commands(library):
 def program():
     print("Добро пожаловать в библиотеку!")
     library = get_library()
-    show_commands()
+    show_commands(COMMANDS)
 
     while True:
-         if not use_commands(library):
-             break
+        if not use_commands(library, COMMANDS):
+            break
 
     print("Работа программы завершена")
+
 
 program()
